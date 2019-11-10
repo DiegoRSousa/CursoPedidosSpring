@@ -33,4 +33,9 @@ public class DevConfig {
 	public EmailService emailService() {
 		return new MockEmailService();
 	}
+	
+//	@Bean
+//	public EmailService emailService() {
+//		return new SmtpEmailService();
+//	}
 }

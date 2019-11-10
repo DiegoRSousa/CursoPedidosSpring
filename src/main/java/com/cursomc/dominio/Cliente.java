@@ -12,11 +12,13 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.cursomc.dominio.enums.Perfil;
 import com.cursomc.dominio.enums.TipoCliente;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -32,22 +34,33 @@ public class Cliente {
 	private String cpfCnpj;
 	@Enumerated(EnumType.STRING)
 	private TipoCliente tipoCliente;
+	@JsonIgnore
+	private String senha;
 	@OneToMany(mappedBy="cliente", cascade = CascadeType.ALL)
 	private List<Endereco> enderecos = new ArrayList<>();
 	@ElementCollection
 	@CollectionTable(name="telefone")
 	private Set<String> telefones = new HashSet<>();
+
+	@ElementCollection(fetch=FetchType.EAGER)
+	@CollectionTable(name="perfis")
+	private Set<Perfil> perfis = new HashSet<>();
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "cliente")
 	private List<Pedido> pedidos = new ArrayList<>();
 
-	public Cliente() { }
+	public Cliente() {
+		addPerfil(Perfil.CLIENTE);
+	}
 
-	public Cliente(String nome, String email, String cpfCnpj, TipoCliente tipoCliente) {
+	public Cliente(String nome, String email, String cpfCnpj, TipoCliente tipoCliente, String senha) {
 		this.nome = nome;
 		this.email = email;
 		this.cpfCnpj = cpfCnpj;
 		this.tipoCliente = (tipoCliente != null) ? tipoCliente : null;
+		this.senha = senha;
+		addPerfil(Perfil.CLIENTE);
 	}
 
 	public Integer getId() {
@@ -88,6 +101,22 @@ public class Cliente {
 
 	public void setTipoCliente(TipoCliente tipoCliente) {
 		this.tipoCliente = tipoCliente;
+	}
+	
+	public String getSenha() {
+		return senha;
+	}
+	
+	public Set<Perfil> getPerfis() {
+		return perfis;	
+	}
+	
+	public void addPerfil(Perfil perfil) {
+		perfis.add(perfil);
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
 	}
 
 	public List<Endereco> getEnderecos() {

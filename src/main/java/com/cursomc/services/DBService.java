@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.cursomc.dominio.Categoria;
@@ -18,6 +19,7 @@ import com.cursomc.dominio.PagamentoComBoleto;
 import com.cursomc.dominio.PagamentoComCartao;
 import com.cursomc.dominio.Pedido;
 import com.cursomc.dominio.Produto;
+import com.cursomc.dominio.enums.Perfil;
 import com.cursomc.dominio.enums.StatusPagamento;
 import com.cursomc.dominio.enums.TipoCliente;
 import com.cursomc.repositories.CategoriaRepository;
@@ -51,6 +53,8 @@ public class DBService {
 	private PagamentoRepository pagamentoRepository;
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
+	@Autowired
+	private BCryptPasswordEncoder pe;
 
 	public void instanciateDataBase() throws ParseException {
 		
@@ -113,17 +117,23 @@ public class DBService {
 		 e1.getCidades().add(cid1);
 		 e2.getCidades().addAll(Arrays.asList(cid2, cid3));
 		 
-		 Cliente cli = new Cliente("Silva", "silva@gmail.com", "99944459432", TipoCliente.PESSOAFISICA);
-		 cli.getTelefones().addAll(Arrays.asList("23494830293", "49483020399"));
+		 Cliente cli1 = new Cliente("Silva", "diego_sousa@outlook.com", "99944459432", TipoCliente.PESSOAFISICA, pe.encode("123"));
+		 cli1.getTelefones().addAll(Arrays.asList("23494830293", "49483020399"));
 		 
-		 Endereco end1 = new Endereco("Rua x", "100", "", "Centro", "58884-000", cli, cid1);
-		 Endereco end2 = new Endereco("Rua y", "200", "", "Expedicionarios", "58123-000", cli, cid2);
-		 cli.getEnderecos().addAll(Arrays.asList(end1, end2));
+		 Cliente cli2 = new Cliente("Ana Costa", "anaa@outlook.com", "98351751014", TipoCliente.PESSOAFISICA, pe.encode("abc"));
+		 cli2.addPerfil(Perfil.ADMIN);
+		 cli2.getTelefones().addAll(Arrays.asList("995867121", "223454439"));
+		 	
+		 Endereco end1 = new Endereco("Rua x", "100", "", "Centro", "58884-000", cli1, cid1);
+		 Endereco end2 = new Endereco("Rua y", "200", "", "Expedicionarios", "58123-000", cli1, cid2);
+		 Endereco end3 = new Endereco("Rua y", "210", "", "Expedicionarios", "58123-000", cli1, cid2);
+		 cli1.getEnderecos().addAll(Arrays.asList(end1, end2));
+		 cli2.setEnderecos(Arrays.asList(end3));
 		 
 		 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		 
-		 Pedido ped1 = new Pedido(sdf.parse("30/09/2019 10:35"), cli, end1);
-		 Pedido ped2 = new Pedido(sdf.parse("01/10/2019 11:10"), cli, end2);
+		 Pedido ped1 = new Pedido(sdf.parse("30/09/2019 10:35"), cli1, end1);
+		 Pedido ped2 = new Pedido(sdf.parse("01/10/2019 11:10"), cli1, end2);
 		 
 		 Pagamento pagto1 = new PagamentoComCartao(StatusPagamento.QUITADO, ped1, 6);
 		 ped1.setPagamento(pagto1);
@@ -132,8 +142,8 @@ public class DBService {
 				 sdf.parse("01/11/2019 10:33"),sdf.parse("01/10/2019 11:00"));
 		 ped2.setPagamento(pagto2);
 		 
-		 cli.getPedidos().addAll(Arrays.asList(ped1, ped2));
-		 cli.setPedidos(Arrays.asList(ped1, ped2));
+		 cli1.getPedidos().addAll(Arrays.asList(ped1, ped2));
+		 cli1.setPedidos(Arrays.asList(ped1, ped2));
 			
 		 ItemPedido ip1 = new ItemPedido(ped1, p1, 0.00, 1, 2000.00);
 		 ItemPedido ip2 = new ItemPedido(ped1, p3, 0.00, 2, 80.00);
@@ -146,8 +156,8 @@ public class DBService {
 		 produtoRepository.saveAll(Arrays.asList(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11));
 		 estadoRepository.saveAll(Arrays.asList(e1, e2));
 		 cidadeRepository.saveAll(Arrays.asList(cid1, cid2, cid3));
-		 clienteRepository.save(cli);
-		 enderecoRepository.saveAll(Arrays.asList(end1, end2));
+		 clienteRepository.saveAll(Arrays.asList(cli1, cli2));
+		 enderecoRepository.saveAll(Arrays.asList(end1, end2, end3));
 		 pedidoRepository.saveAll(Arrays.asList(ped1, ped2));
 		 pagamentoRepository.saveAll(Arrays.asList(pagto1, pagto2));
 		 itemPedidoRepository.saveAll(Arrays.asList(ip1, ip2, ip3));
