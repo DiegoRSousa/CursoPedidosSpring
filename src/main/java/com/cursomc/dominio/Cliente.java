@@ -42,6 +42,7 @@ public class Cliente {
 	@CollectionTable(name="telefone")
 	private Set<String> telefones = new HashSet<>();
 
+	@Enumerated(EnumType.STRING)
 	@ElementCollection(fetch=FetchType.EAGER)
 	@CollectionTable(name="perfis")
 	private Set<Perfil> perfis = new HashSet<>();
